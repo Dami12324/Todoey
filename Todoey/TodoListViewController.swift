@@ -7,10 +7,19 @@ class TodoListViewController: UITableViewController {
     var itemArray = ["Find Mike", "Buy Eggs", "Destroy White People"]
     
     
+    // STEP NINETEEN - Creating a brand new object in order to use user default (To help us save data on the user's phone when our app isn't running nomore)
+    let defaults = UserDefaults.standard
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
 
+        // STEP TWENTY ONE - Retrieving our data from the defaults object that now stores our itemArray with the new values that the user typed into the UIAlert appended to the end of the array. We want to create a constant called, "items" and set that constant to equal the array inside the defaults object using the key identifier we gave it in STEP TWENTY when we saved the itemArray into the defaults object. We're casting it as an array of strings. We put it in an if statement because if there is no value inside the defaults array, our app might crash.
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemArray = items
+        }
+        
     }
 
     
@@ -68,6 +77,9 @@ class TodoListViewController: UITableViewController {
         { (action) in
             // STEP SEVENTEEN - What will happen once the user clicks the Add Item button on our UIAlert. In our case, we want to append whatever is typed into the textfield to the end of the itemArray created in STEP ONE. Since we're inside a closure, we want to specify "self." in front of the method.
             self.itemArray.append(textField.text!)
+            
+            // STEP TWENTY - Save the updated item array to our user default. We have to include, "self" because we're inside of a closure. The "forekey: "TodoListArray"" is going to identify the array inside our user defaults object created in STEP NINETEEN. So "TodoListArray" is just a name we gave it to identify the array. The forekey is what's going to allow us(i.e the key) to grab back the itemArray that inside of the defaults object.
+            self.defaults.setValue(self.itemArray, forKey: "TodoListArray")
             
             // STEP EIGHTEEN - The line of code below reloads the data in the tableView rows, taking in to account, the new data we just appended to the end of the itemArray above. If we don't reload, yes the item that the user typed will be appended to our array and stored in it however, it would not show in our TableView. We're also in a closure so we include the "self." in front of the method.
             self.tableView.reloadData()
