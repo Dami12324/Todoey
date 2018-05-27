@@ -4,7 +4,7 @@ class TodoListViewController: UITableViewController {
 
     
     // STEP ONE - Create a brand new item array to be listed on our startup TableView
-    let itemArray = ["Find Mike", "Buy Eggs", "Destroy White People"]
+    var itemArray = ["Find Mike", "Buy Eggs", "Destroy White People"]
     
     
     override func viewDidLoad() {
@@ -51,6 +51,43 @@ class TodoListViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         
     }
+    
+    
+    
+    // STEP TEN - Link the Add New Item "+" Button to code
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        
+        // STEP SIXTEEN - Creating a local TextField variable that has the scope of the entire "addButtonPressed" IBAction.
+        var textField = UITextField()
+        
+        // STEP ELEVEN - Creating Pop-Up (UIAlert Controller).
+        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        
+        // STEP TWELVE - Creating the Pop-Up (UIAlert Controller) action.
+        let action = UIAlertAction(title: "Add Item", style: .default)
+        { (action) in
+            // STEP SEVENTEEN - What will happen once the user clicks the Add Item button on our UIAlert. In our case, we want to append whatever is typed into the textfield to the end of the itemArray created in STEP ONE. Since we're inside a closure, we want to specify "self." in front of the method.
+            self.itemArray.append(textField.text!)
+            
+            // STEP EIGHTEEN - The line of code below reloads the data in the tableView rows, taking in to account, the new data we just appended to the end of the itemArray above. If we don't reload, yes the item that the user typed will be appended to our array and stored in it however, it would not show in our TableView. We're also in a closure so we include the "self." in front of the method.
+            self.tableView.reloadData()
+        }
+        
+        // STEP FIFTEEN - Adding a TextField to our UIAlert where the user can type in a text inside the UIAlert Pop-up. We're going to call the Textfield that we create, "alertTextField" and in the completion block, we're going to set up the alert textfield.
+        alert.addTextField { (alertTextField) in
+            // STEP SIXTEEN - This is the string that's going to be shown in gray and dissapear when the user clicks on that TextField
+            alertTextField.placeholder = "Create new item"
+            textField = alertTextField
+        }
+        
+        
+        // STEP THIRTEEN - Adding the action to our UIAlert
+        alert.addAction(action)
+        
+        // STEP FOURTEEN - Showing the UIAlert (I.E, the last step in making it work. Showing it to the user when they click the "+" Button in the top right at the UI). We want it animated so we set it to true and we dont want anything special to happen upon completion so we set it to nil.
+        present(alert, animated: true, completion: nil)
+    }
+    
     
     
     
