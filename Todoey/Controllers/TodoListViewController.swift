@@ -8,32 +8,40 @@ class TodoListViewController: UITableViewController {
     
     
     // STEP NINETEEN - Creating a brand new object in order to use user default (To help us save data on the user's phone when our app isn't running nomore)
-    let defaults = UserDefaults.standard
+    // let defaults = UserDefaults.standard
+    
+    
+    // STEP THIRTY FOUR - Creating a file path to the document's folder that IOS gives us where our app will be stored in the user's device. This is also a singleton BTW meaning that there can only be one copy of it that can be shared across all of our classes and objects. The "for" paramater we need to pass in a argument for is the document directory. The "in" parameter is the location that we're going to look for it. I.E the user's home directory. -> The place where we're going to save their personal items assocaited with this current app that we're building. We're storing this file path into a constant. Because this is an array (created by apple), we're going to item out of the array and tap into the appending pathcomponent method. The argument passed in this paramater, we can call anything we want. We called it, "Items.plist"
+    let  dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // STEP TWENTY FOUR - Creating a new object item from the item class in the Data Model Folder that holds the blueprint
-        let newItem = Item()
-        newItem.title = "Find Mike"
-        itemArray.append(newItem)
         
-        let newItem2 = Item()
-        newItem2.title = "Buy Eggs"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "Destroy Cancer"
-        itemArray.append(newItem3)
+        // STEP TWENTY FOUR - Creating a new object item from the item class in the Data Model Folder that holds the blueprint : As of STEP FORTY FOUR, we no longer need this hard coded initialization.
+//        let newItem = Item()
+//        newItem.title = "Find Mike"
+//        itemArray.append(newItem)
+//
+//        let newItem2 = Item()
+//        newItem2.title = "Buy Eggs"
+//        itemArray.append(newItem2)
+//
+//        let newItem3 = Item()
+//        newItem3.title = "Destroy Cancer"
+//        itemArray.append(newItem3)
         
         
     
         // STEP TWENTY ONE && STEP THIRTY THREE - Retrieving our data from the defaults object that now stores our itemArray with the new values that the user typed into the UIAlert appended to the end of the array. We want to create a constant called, "items" and set that constant to equal the array inside the defaults object using the key identifier we gave it in STEP TWENTY when we saved the itemArray into the defaults object. We're casting it as an array of Data Type, "Item" from the Data Model folder, Item class. We put it in an if statement because if there is no value inside the defaults array, our app might crash. STEP TWENTY TWO is in the Data Model folder, Item class.
-        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-            itemArray = items
-        }
+//        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
+//            itemArray = items
+//        }
         
+        
+        // STEP FORTY - Rather than the code above, we're going to call a method called, "loadItems" that we'll create in STEP FORTY ONE. It will decode our itemArray
+        loadItems()
     }
 
     
@@ -105,9 +113,12 @@ class TodoListViewController: UITableViewController {
 //        }
         
         
+        // STEP THIRTY NINE - Rather than type the entire code here, we can just put them in a function and call it here (The lines of code below). Since we're inside of a closure, we have to put, "self" in front of it.
+        self.saveItems()
+        
         
         // STEP TWENTY NINE - This Method below forces the TableView to call it's datasource method again so that it reloads the data that is supposed to be inside.
-        tableView.reloadData()
+       // tableView.reloadData() - > We delete this and don't need it anymore because it exists in the function that we call above -> in (STEP THIRTY NINE)
         
         
         
@@ -140,11 +151,11 @@ class TodoListViewController: UITableViewController {
             // STEP SEVENTEEN && STEP TWENTY SIX - What will happen once the user clicks the Add Item button on our UIAlert. In our case, we want to append whatever is typed into the textfield to the end of the itemArray created in STEP ONE. Since we're inside a closure, we want to specify "self." in front of the method. This is a code touch up after STEP TWENTY FIVE from above. Now, that we saved whatever the user typed into the UIAlert to our newly created object's property (title) named, "newItem", we can append the object to our array now.
             self.itemArray.append(newItem)
             
-            // STEP TWENTY - Save the updated item array to our user default. We have to include, "self" because we're inside of a closure. The "forekey: "TodoListArray"" is going to identify the array inside our user defaults object created in STEP NINETEEN. So "TodoListArray" is just a name we gave it to identify the array. The forekey is what's going to allow us(i.e the key) to grab back the itemArray that inside of the defaults object.
-            self.defaults.setValue(self.itemArray, forKey: "TodoListArray")
+
             
-            // STEP EIGHTEEN - The line of code below reloads the data in the tableView rows, taking in to account, the new data we just appended to the end of the itemArray above. If we don't reload, yes the item that the user typed will be appended to our array and stored in it however, it would not show in our TableView. We're also in a closure so we include the "self." in front of the method.
-            self.tableView.reloadData()
+            // STEP THIRTY NINE - Rather than type the entire code here, we can just put them in a function and call it here (The lines of code below). Since we're inside of a closure, we have to put, "self" in front of it.
+            self.saveItems()
+            
         }
         
         // STEP FIFTEEN - Adding a TextField to our UIAlert where the user can type in a text inside the UIAlert Pop-up. We're going to call the Textfield that we create, "alertTextField" and in the completion block, we're going to set up the alert textfield.
@@ -162,6 +173,61 @@ class TodoListViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
+    
+    
+    
+    // STEP THIRTY EIGHT - Creating a new method that saves items in our item array to the propertylist encoder
+    func saveItems() {
+        
+        // STEP TWENTY - Save the updated item array to our user default. We have to include, "self" because we're inside of a closure. The "forekey: "TodoListArray"" is going to identify the array inside our user defaults object created in STEP NINETEEN. So "TodoListArray" is just a name we gave it to identify the array. The forekey is what's going to allow us(i.e the key) to grab back the itemArray that inside of the defaults object.
+        // self.defaults.setValue(self.itemArray, forKey: "TodoListArray")
+        
+        
+        // STEP THIRTY FIVE - Rather than the Code in STEP TWENTY that saves the items in the array to our defaults, we want to instead creating something called an Enconder. The encoder is a new object of the Data Type "PropertyListEncoder()" from the method given to us by apple.
+        let encoder = PropertyListEncoder()
+        
+        
+        // STEP THIRTY SIX - Encoding our data (I.E our Item Array) into the property list. The "encode()" method can throw an error so we put this in a do, try, catch block. STEP THIRTY SEVEN is in the Data Model, Item class.
+        do {
+            let data = try encoder.encode(itemArray)
+            
+            // Once we've encoded our data, the next step is to write the data to our File Path created in STEP THIRTY FOUR with a constant named, "dataFilePath". This is also a method that can throw errors so we have to mark it with a try, block.
+            try data.write(to: dataFilePath!)
+        } catch {
+            // If there is an error, encoding our data (I.E our Item Array) into a property list, we want to print that error out for us the Developer to be able to see.
+            print("Error encoding item array, \(error)")
+        }
+        
+        
+        // STEP EIGHTEEN - The line of code below reloads the data in the tableView rows, taking in to account, the new data we just appended to the end of the itemArray above. If we don't reload, yes the item that the user typed will be appended to our array and stored in it however, it would not show in our TableView. We're also in a closure so we include the "self." in front of the method.
+        self.tableView.reloadData()
+        
+    }
+    
+    
+    
+    
+    // STEP FORTY ONE - Creating the loadItems() Method
+    func loadItems() {
+        
+        // STEP FORTY TWO - We're tapping into our data by creating a constant and setting the data using the contents of the url. The contents of the URL is our file path constant that we created in STEP THIRTY FOUR. This aswell is a method that can throw an error so we implement the try block which will turn the object into an optional. Now we can use optional binding to unwrap it safely without the app crashing.
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            
+            
+           // STEP FORTY THREE - Create a Decoder to Decode our object since we have an Encoder in the function, STEP THIRTY EIGHT.
+           let decoder = PropertyListDecoder()
+            
+           
+           // STEP FORTY FOUR - Decoding our data (I.E our Item Array) into the property list. The "decode()" method can throw an error so we put this in a do, try, catch block. The first parameter of the decode method is specifying the DataType that you want it to decode. (In our case, an an array of Data Type Items(From the Data Model folder, Item class). Because we're not specifying objects, in order to refer to the Type of the array of Items, we have to specify, ".self"). The second parameter is the data which in our case is the data that we safely unwrapped in STEP FORTY TWO. The next STEP, STEP FORTY FIVE is in the Data Model folder, Item class file.
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error, decoding item array, \(error)")
+            }
+            
+        }
+        
+    }
     
     
     
