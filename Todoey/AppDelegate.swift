@@ -10,9 +10,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // This method gets called when the app gets loaded up. It doesn't matter of the rest of the app is going to crash. This is the first thing that happens(even before the "override viewDidLoad()" function inside the "ToDoListViewController" class).......................................................................
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
-        
-        
         return true
     }
 
